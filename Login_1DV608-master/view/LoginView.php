@@ -21,7 +21,8 @@ class LoginView {
 	 */
 	public function response() {
 		$message = $this->getErrorMessage();
-		$response = $this->generateLoginFormHTML($message);
+		$user = $this->getRequestUserName();
+		$response = $this->generateLoginFormHTML($message,$user);
 		//$response .= $this->generateLogoutButtonHTML($message);
 		return $response;
 	}
@@ -45,7 +46,7 @@ class LoginView {
 	* @param $message, String output message
 	* @return  void, BUT writes to standard output!
 	*/
-	private function generateLoginFormHTML($message) {
+	private function generateLoginFormHTML($message,$user) {
 		return '
 			<form method="post" > 
 				<fieldset>
@@ -53,7 +54,7 @@ class LoginView {
 					<p id="' . self::$messageId . '">' . $message . '</p>
 					
 					<label for="' . self::$name . '">Username :</label>
-					<input type="text" id="' . self::$name . '" name="' . self::$name . '" value="" />
+					<input type="text" id="' . self::$name . '" name="' . self::$name . '" value="'.$user.'" />
 
 					<label for="' . self::$password . '">Password :</label>
 					<input type="password" id="' . self::$password . '" name="' . self::$password . '" />
@@ -70,17 +71,32 @@ class LoginView {
 	//CREATE GET-FUNCTIONS TO FETCH REQUEST VARIABLES
 	private function getRequestUserName() {
 		//RETURN REQUEST VARIABLE: USERNAME
+		if(isset($_POST[self::$name])){
+			return $_POST[self::$name];
+		}
 	}
 	private function getErrorMessage(){
 		if(isset($_POST[self::$login])){
 			if(empty($_POST[self::$password])&&empty($_POST[self::$name])){
-				return 'username is missing';
+				return 'Username is missing';
 			}elseif(empty($_POST[self::$name])){
-				return 'username is missing';
+				return 'Username is missing';
 			}elseif(empty($_POST[self::$password])){
-				return 'password is missing';
+				return 'Password is missing';
+			}elseif($_POST[self::$name] == "Admin"&&empty($_POST[self::$password])){
+				return 'Password is missing';
+			}elseif($_POST[self::$password] == "Password"&&empty($_POST[self::$name])){
+				return 'Username is missing';
 			}
 			return '';
+		}
+	}
+
+	private function check(){
+		if($_POST[self::$name] == "Admin"&&$_POST[self::$name] == "Password"){
+			return true;
+		}else{
+			return false;
 		}
 	}
 }

@@ -4,23 +4,18 @@ class DateTimeView {
 
 
 	public function show() {
-                date_default_timezone_set('America/Chicago'); // CDT
-		$timeString = $this->currentTime();
-
+        date_default_timezone_set('Europe/Stockholm'); // CDT // CDT
+        $timeString = $this->currentTime();
 		return '<p>' . $timeString . '</p>';
 	}
-        
+        //metod to create a string of current time
         private function currentTime(){
-            date_default_timezone_set('Europe/Stockholm'); // CDT
             $info = getdate();
-            $date = date("jS",strtotime($info['mday']));
-            $day = date("l",  strtotime($info['mday']));
-            $month = date("F",strtotime($info['mon']));
-            $year = $info['year'];
-            $hour = $info['hours'];
-            $min = $info['minutes'];
-            $sec = $info['seconds'];
-
-            return "$day,$date of $month $year, The time is $hour:$min:$sec";
+            $date = date("jS");
+            $day = $info['weekday'];
+            $month = date("F");
+            $year = date("o");
+            $time = date("H:i:s");
+            return "$day, the $date of $month $year, The time is $time";
         }
 }
