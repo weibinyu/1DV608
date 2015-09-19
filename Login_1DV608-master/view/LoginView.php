@@ -87,6 +87,8 @@ class LoginView {
 				return 'Password is missing';
 			}elseif($_POST[self::$password] == "Password"&&empty($_POST[self::$name])){
 				return 'Username is missing';
+			}elseif($this->check() == false){
+				return 'Wrong name or password';
 			}
 			return '';
 		}
