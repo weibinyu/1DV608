@@ -20,10 +20,22 @@ class LoginView {
 	 * @return  void BUT writes to standard output and cookies!
 	 */
 	public function response() {
-		$message = $this->getErrorMessage();
-		$user = $this->getRequestUserName();
-		$response = $this->generateLoginFormHTML($message,$user);
-		//$response .= $this->generateLogoutButtonHTML($message);
+        $name = $this->getRequestUserName();
+        $pass = $this->getRequestPassword();
+        if($_SESSION['LoggedIn'] == false) {
+            if ($this->check($name, $pass) == false) {
+                $message = $this->getErrorMessage();
+                $user = $this->getRequestUserName();
+                $response = $this->generateLoginFormHTML($message, $user);
+            } else {
+                $message = "Welcome";
+                $_SESSION["LoggedIn"] = true;
+                $response = $this->generateLogoutButtonHTML($message);
+            }
+        }else{
+            $message = "Welcome";
+            $response = $this->generateLogoutButtonHTML($message);
+        }
 		return $response;
 	}
 
@@ -75,6 +87,12 @@ class LoginView {
 			return $_POST[self::$name];
 		}
 	}
+    private function getRequestPassword() {
+        //RETURN REQUEST VARIABLE: Password
+        if(isset($_POST[self::$password])){
+            return $_POST[self::$password];
+        }
+    }
 	private function getErrorMessage(){
 		if(isset($_POST[self::$login])){
 			if(empty($_POST[self::$password])&&empty($_POST[self::$name])){
@@ -87,15 +105,17 @@ class LoginView {
 				return 'Password is missing';
 			}elseif($_POST[self::$password] == "Password"&&empty($_POST[self::$name])){
 				return 'Username is missing';
-			}elseif($this->check() == false){
+			}elseif($this->check($_POST[self::$name],$_POST[self::$password]) == false){
 				return 'Wrong name or password';
 			}
 			return '';
 		}
 	}
 
-	private function check(){
-		if($_POST[self::$name] == "Admin"&&$_POST[self::$name] == "Password"){
+	private function check($name,$pass){
+		$correctName = "Admin";
+		$correctPass = "Password";
+		if($name == $correctName && $pass == $correctPass){
 			return true;
 		}else{
 			return false;
