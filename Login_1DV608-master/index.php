@@ -2,7 +2,9 @@
 
 //Start a session to know if user logged in
 session_start();
-$_SESSION['LoggedIn'] = false;
+if(!isset($_SESSION['LoggedIn'])){
+    $_SESSION['LoggedIn'] = false;
+}
 //INCLUDE THE FILES NEEDED...
 require_once('view/LoginView.php');
 require_once('view/DateTimeView.php');
