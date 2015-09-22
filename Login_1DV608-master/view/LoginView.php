@@ -9,9 +9,12 @@ class LoginView {
     private static $cookiePassword = 'LoginView::CookiePassword';
     private static $keep = 'LoginView::KeepMeLoggedIn';
     private static $messageId = 'LoginView::Message';
+    private $AccountModel;
 
-
-
+    //pass accoutmodel to loginView so it can use the info for model
+    public function __construct(AccountModel $model){
+        $this->AccountModel = $model;
+    }
     /**
      * Create HTTP response
      *
@@ -20,10 +23,13 @@ class LoginView {
      * @return  void BUT writes to standard output and cookies!
      */
     public function response() {
+        //get user input name and pass
         $name = $this->getRequestUserName();
         $pass = $this->getRequestPassword();
-
+        //check if user are inlogged or not by using session
         if($_SESSION['LoggedIn'] == true){
+            //if user logged in and press logout set loggedin to false and destory this session,if user don't press
+            //logout then just show logout form
             if(isset($_POST[self::$logout])){
                 $_SESSION["LoggedIn"] = false;
                 $message = "Bye bye!";
@@ -34,7 +40,9 @@ class LoginView {
                 $response = $this->generateLogoutButtonHTML($message);
             }
         }elseif($_SESSION['LoggedIn'] == false) {
-            if ($this->check($name, $pass) == false) {
+            //if user not inlogged and press login check if user has the right account from model, if not get Error
+            //message if is the right account show welcome and set session to loggedin and show logout form
+            if ($this->AccountModel->check($name,$pass)==false) {
                 $message = $this->getErrorMessage();
                 $response = $this->generateLoginFormHTML($message, $name);
             } else {
@@ -43,6 +51,7 @@ class LoginView {
                 $response = $this->generateLogoutButtonHTML($message);
             }
         }
+        //return to layoutview;
         return $response;
     }
 
@@ -101,6 +110,7 @@ class LoginView {
         }
     }
 
+    //generate different error messages in different cases
     private function getErrorMessage(){
         if(isset($_POST[self::$login])){
             if(empty($_POST[self::$password])&&empty($_POST[self::$name])){
@@ -120,13 +130,4 @@ class LoginView {
         }
     }
 
-    private function check($name,$pass){
-        $correctName = "Admin";
-        $correctPass = "Password";
-        if($name == $correctName && $pass == $correctPass){
-            return true;
-        }else{
-            return false;
-        }
-    }
 }
